@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/note_listview.dart';
 
-import 'add_note_dialog.dart';
+import 'note.dart';
+import 'note_details.dart';
 
 void main() => runApp(MyApp());
 
@@ -38,8 +39,10 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+
+
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> items = [];
+  List<Note> items = [];
 
   @override
   Widget build(BuildContext context) {
@@ -56,16 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialog(
-              context: context,
-              builder: (_) {
-                return AddNoteDialog(
-                  noteCallBack: (note) {
-                    items.add(note);
-                    setState(() {});
-                  },
-                );
-              });
+          Navigator.of(context).push(_createRoute());
         },
         tooltip: 'Create a Note',
         child: Icon(Icons.add),
@@ -73,4 +67,28 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  Route _createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => NoteDetailsWidget(
+        noteCallBack: (note) {
+          items.add(note);
+          setState(() {});
+        },
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(0.0, 1.0);
+        var end = Offset.zero;
+        var curve = Curves.ease;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
 }

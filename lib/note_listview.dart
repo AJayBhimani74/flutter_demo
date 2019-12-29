@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/note.dart';
 import 'package:tuple/tuple.dart';
 
-import 'add_note_dialog.dart';
+import 'note_details.dart';
+import 'main.dart';
 
 class NoteListView extends StatefulWidget {
   const NoteListView({this.items});
 
-  final List<String> items;
+  final List<Note> items;
 
   @override
   _NoteListViewState createState() {
@@ -20,9 +22,9 @@ class _NoteListViewState extends State<NoteListView> {
   final int edit = 1;
   final int delete = 2;
 
-  List<String> items;
+  List<Note> items;
 
-  _NoteListViewState(List<String> items) {
+  _NoteListViewState(List<Note> items) {
     this.items = items;
   }
 
@@ -44,38 +46,52 @@ class _NoteListViewState extends State<NoteListView> {
           )
         : new Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: new ListView.separated(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: new ListView.separated(
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
                 return GestureDetector(
-                  onTapDown: _storePosition,
-                  onLongPress: () {
-                    openOptionsMenu(context, index);
+                  onTap: () {
+                    Route route = MaterialPageRoute(
+                        builder: (context) => NoteDetailsWidget(
+                              note: items[index],
+                              noteCallBack: (note) {
+                                setState(() {
+                                  items[index] = note;
+                                });
+                              },
+                            ));
+                    Navigator.push(context, route);
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
-                          child: new Text(
-                            '${index + 1}. ${items[index]}',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 20, color: Colors.black87),
-                          ),
+                          child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                new Text(
+                                  items[index].title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                new Text(
+                                  items[index].note,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.black87),
+                                )
+                              ]),
                           flex: 10,
                         ),
-                        Expanded(
-                          child: GestureDetector(
-                              onTap: () {
-                                openOptionsMenu(context, index);
-                              },
-                              child: new Icon(
-                                Icons.more_vert,
-                              )),
-                          flex: 1,
-                        )
                       ],
                     ),
                   ),
@@ -84,8 +100,8 @@ class _NoteListViewState extends State<NoteListView> {
               separatorBuilder: (context, index) => Divider(
                 color: Colors.black,
               ),
-          ),
-            ));
+            ),
+          ));
   }
 
   void openOptionsMenu(BuildContext context, int index) {
@@ -135,14 +151,7 @@ class _NoteListViewState extends State<NoteListView> {
         showDialog(
             context: context,
             builder: (_) {
-              return AddNoteDialog(
-                note: items[data.item2],
-                noteCallBack: (note) {
-                  setState(() {
-                    items[data.item2] = note;
-                  });
-                },
-              );
+              return;
             });
       }
 
