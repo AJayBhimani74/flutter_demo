@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/note.dart';
-import 'package:tuple/tuple.dart';
 
 import 'note_details.dart';
-import 'main.dart';
+
 
 class NoteListView extends StatefulWidget {
   const NoteListView({this.items});
@@ -17,7 +16,6 @@ class NoteListView extends StatefulWidget {
 }
 
 class _NoteListViewState extends State<NoteListView> {
-  var _tapPosition;
 
   final int edit = 1;
   final int delete = 2;
@@ -28,9 +26,6 @@ class _NoteListViewState extends State<NoteListView> {
     this.items = items;
   }
 
-  void _storePosition(TapDownDetails details) {
-    _tapPosition = details.globalPosition;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,64 +97,5 @@ class _NoteListViewState extends State<NoteListView> {
               ),
             ),
           ));
-  }
-
-  void openOptionsMenu(BuildContext context, int index) {
-    RenderBox overlay = Overlay.of(context).context.findRenderObject();
-    showMenu(
-      position: RelativeRect.fromRect(
-          _tapPosition & Size(20, 20),
-          // smaller rect, the touch area
-          Offset.zero & overlay.size // Bigger rect, the entire screen
-          ),
-      context: context,
-      items: <PopupMenuEntry<Tuple2<int, int>>>[
-        PopupMenuItem(
-          value: Tuple2(edit, index),
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.edit),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Text("Edit"),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuDivider(
-          height: 1,
-        ),
-        PopupMenuItem(
-          value: Tuple2(delete, index),
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.delete),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Text("Delete"),
-              ),
-            ],
-          ),
-        )
-      ],
-    ).then<void>((Tuple2 data) {
-      if (data == null) {
-        return;
-      }
-
-      if (data.item1 == edit) {
-        showDialog(
-            context: context,
-            builder: (_) {
-              return;
-            });
-      }
-
-      if (data.item1 == delete) {
-        setState(() {
-          items.removeAt(data.item2);
-        });
-      }
-    });
   }
 }
